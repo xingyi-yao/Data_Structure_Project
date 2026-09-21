@@ -1,4 +1,5 @@
 # 以下是仓库结构（暂定）
+```
 small-gpt/
 │
 ├── README.md                       # 项目总说明，三人共同维护
@@ -107,3 +108,4 @@ small-gpt/
     ├── training.md                 # 【B】
     ├── inference.md                # 【C】
     └── ui.md                       # 【C】
+```
