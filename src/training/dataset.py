@@ -1,4 +1,4 @@
-"""B 的数据模块：文本 -> token IDs -> (x, y) batch。
+﻿"""B 的数据模块：文本 -> token IDs -> (x, y) batch。
 
 与 A/C 的接口约定：
 - C 的 CharTokenizer.encode(text) -> list[int]
@@ -50,8 +50,8 @@ class TextDataset:
         self.val_ids = token_ids[split_idx:]
 
         # 防止 val 太短切不出一个完整窗口。
-        if len(self.val_ids) < context_length + 1:
-            self.val_ids = self.train_ids[-(context_length + 1):]
+        if len(self.val_ids) < context_length + 2:
+            self.val_ids = self.train_ids[-(context_length + 2):]
 
     @classmethod
     def from_text(cls, text, context_length=128, train_ratio=0.9,
@@ -91,13 +91,13 @@ class TextDataset:
         # 起始位置的合法范围：[0, len(ids) - T - 1]
         # 这样 x = ids[i:i+T]，y = ids[i+1:i+T+1] 都能取到。
         max_start = len(ids) - T - 1
-        if max_start <= 0:
+        if max_start < 0:
             raise ValueError(
                 f"{split} 数据太短 ({len(ids)} tokens)，至少需要 {T + 2}"
             )
 
         # 随机选 batch_size 个起始位置。
-        starts = torch.randint(0, max_start, (batch_size,))
+        starts = torch.randint(0, max_start + 1, (batch_size,))
 
         x_list = []
         y_list = []
@@ -133,3 +133,6 @@ if __name__ == "__main__":
     assert torch.equal(y[0, :-1], x[0, 1:]), "y 必须是 x 右移一位"
     print("右移检查通过！")
     print("dataset.py 自测 OK")
+
+
+
