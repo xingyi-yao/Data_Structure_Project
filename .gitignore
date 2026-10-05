@@ -1,3 +1,9 @@
 /.vscode
 /check_overfit.py
 /outputs
+__pycache__/
+*.pyc
+*.pyo
+*.bak
+.pytest_cache/
+checkpoints/*.pt

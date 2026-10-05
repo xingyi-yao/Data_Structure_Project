@@ -30,7 +30,7 @@ def finetune(args):
 
     # ---- 1. 加载预训练模型 ----
     print(f"\n加载预训练模型: {args.pretrain_path}")
-    model, _, _, _, config = load_checkpoint(args.pretrain_path, device)
+    model, _, _, _, config, _ = load_checkpoint(args.pretrain_path, device)
     print(f"预训练模型加载成功: vocab_size={config['vocab_size']}, "
           f"n_layer={config['n_layer']}")
 
@@ -46,6 +46,7 @@ def finetune(args):
         context_length=config["context_length"],
         train_ratio=args.train_ratio,
         tokenizer=tokenizer,   # 复用预训练词表
+        split_by_line=True,    # 按整首诗划分 train/val
     )
     print(f"训练 token 数: {len(dataset.train_ids)}")
     print(f"验证 token 数: {len(dataset.val_ids)}")
@@ -111,9 +112,18 @@ def finetune(args):
                     best_val_loss=best_val_loss,
                     config=config,
                     path=ckpt_dir / "finetune_best.pt",
+                    stage="finetune",
+                    tokenizer=tokenizer,
+                    data_path=args.data_path,
+                    parent_checkpoint=args.pretrain_path,
                 )
                 print(f"  -> 保存最好的微调模型: finetune_best.pt "
                       f"(val_loss={val_loss:.4f})")
+
+    # ---- 6.5 测试集评估 ----
+    test_loss = evaluate(model, dataset, args.eval_iters, args.batch_size,
+                         device, split="test")
+    print(f"\n测试集 loss: {test_loss:.4f}")
 
     # ---- 7. 保存最后的微调模型 ----
     save_checkpoint(
@@ -123,6 +133,10 @@ def finetune(args):
         best_val_loss=best_val_loss,
         config=config,
         path=ckpt_dir / "finetune_last.pt",
+        stage="finetune",
+        tokenizer=tokenizer,
+        data_path=args.data_path,
+        parent_checkpoint=args.pretrain_path,
     )
     print(f"\n保存最终微调模型: finetune_last.pt")
 
@@ -132,6 +146,7 @@ def finetune(args):
         f.write(f"微调步数: {args.max_steps}\n")
         f.write(f"学习率: {args.learning_rate}\n")
         f.write(f"最好 val_loss: {best_val_loss:.4f}\n")
+        f.write(f"测试集 loss: {test_loss:.4f}\n")
         f.write(f"\n训练 loss:\n")
         for step, loss in train_losses:
             f.write(f"step {step}: {loss:.4f}\n")
@@ -159,7 +174,7 @@ def main():
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--learning_rate", type=float, default=1e-5)
     parser.add_argument("--min_lr", type=float, default=1e-6)
-    parser.add_argument("--max_steps", type=int, default=500)
+    parser.add_argument("--max_steps", type=int, default=1000)
     parser.add_argument("--warmup_steps", type=int, default=20)
     parser.add_argument("--grad_clip", type=float, default=1.0)
     parser.add_argument("--weight_decay", type=float, default=0.1)

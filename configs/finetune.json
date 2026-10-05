@@ -1,0 +1,33 @@
+{
+  "_comment": "微调配置：用莎士比亚十四行诗学习诗歌风格",
+  "data": {
+    "data_path": "data/raw/finetune.txt",
+    "tokenizer_path": "checkpoints/tokenizer.json",
+    "train_ratio": 0.9,
+    "val_ratio": 0.05,
+    "split_by_line": true
+  },
+  "model": {
+    "_comment": "模型结构从预训练 checkpoint 继承，这里不指定",
+    "pretrain_path": "checkpoints/pretrain_best.pt"
+  },
+  "training": {
+    "batch_size": 24,
+    "learning_rate": 1e-05,
+    "min_lr": 1e-06,
+    "max_steps": 5000,
+    "warmup_steps": 20,
+    "grad_clip": 1.0,
+    "weight_decay": 0.1,
+    "seed": 42
+  },
+  "logging": {
+    "log_interval": 10,
+    "eval_interval": 100,
+    "eval_iters": 20
+  },
+  "output": {
+    "checkpoint_dir": "checkpoints",
+    "output_dir": "outputs/finetune"
+  }
+}

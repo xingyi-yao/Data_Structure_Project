@@ -45,11 +45,12 @@ class TestTextDataset(unittest.TestCase):
         self.assertEqual(y.dtype, torch.long)
 
     def test_train_val_split(self):
-        """train 和 val 的 token 总数等于原始 token 数。"""
-        # 用小的 context_length，避免 val 被替换成 train 尾部
+        """train + val + test 的 token 总数等于原始 token 数。"""
+        # 用 context_length=1，避免 val/test 被替换
         dataset = TextDataset.from_text(
-            self.text, context_length=2, train_ratio=0.8)
-        total = len(dataset.train_ids) + len(dataset.val_ids)
+            self.text, context_length=1, train_ratio=0.7, val_ratio=0.15)
+        total = (len(dataset.train_ids) + len(dataset.val_ids)
+                 + len(dataset.test_ids))
         self.assertEqual(total, len(dataset.tokenizer.encode(self.text)))
 
     def test_too_short_text_raises(self):

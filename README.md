@@ -8,13 +8,19 @@ small-gpt/
 ├── .gitignore
 │
 ├── data/                           # 【B 主负责】数据
+│   ├── README.md                   # 数据来源、清洗、去重、划分说明
 │   ├── raw/
-│   │   ├── pretrain.txt
-│   │   └── finetune.txt
+│   │   ├── pretrain.txt            # 预训练数据（莎士比亚戏剧）
+│   │   └── finetune.txt            # 微调数据（莎士比亚十四行诗）
 │   │
 │   └── processed/
 │       ├── train.txt
-│       └── val.txt
+│       ├── val.txt
+│       └── test.txt
+│
+├── configs/                        # 【B】训练超参数配置
+│   ├── pretrain.json
+│   └── finetune.json
 │
 ├── src/
 │   │
@@ -78,9 +84,11 @@ small-gpt/
 │   └── test_kv_cache.py
 │
 ├── checkpoints/                    # 【B 生成】
+│   ├── tokenizer.json              # 词表（预训练+微调共用）
 │   ├── pretrain_best.pt
 │   ├── pretrain_last.pt
-│   └── finetune_best.pt
+│   ├── finetune_best.pt
+│   └── finetune_last.pt
 │
 ├── outputs/
 │   ├── training/                   # 【B】
@@ -91,7 +99,9 @@ small-gpt/
 │   │   └── generation_samples.txt
 │   │
 │   ├── finetune/                   # 【B】
-│   │   └── before_after.txt
+│   │   ├── before_after.txt
+│   │   ├── finetune_log.txt
+│   │   └── loss_curve.png
 │   │
 │   └── benchmark/                  # 【C】
 │       ├── benchmark_results.txt

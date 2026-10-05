@@ -16,6 +16,8 @@ import torch
 
 from src.model.gpt import GPT
 from src.training.dataset import TextDataset
+from src.training.checkpoint import save_checkpoint
+from src.tokenizer.char_tokenizer import CharTokenizer
 
 
 # ---------------------------------------------------------------------------
@@ -51,15 +53,15 @@ def get_lr(step, warmup_steps, max_steps, max_lr, min_lr):
 
 
 @torch.no_grad()
-def evaluate(model, dataset, eval_iters, batch_size, device):
-    """在 val 集上算平均 loss。
+def evaluate(model, dataset, eval_iters, batch_size, device, split="val"):
+    """在指定 split（val/test）上算平均 loss。
 
     用 torch.no_grad() 是因为验证不需要反向传播，省显存省时间。
     """
     model.eval()  # 切换到评估模式（关闭 dropout）
     losses = []
     for _ in range(eval_iters):
-        x, y = dataset.get_batch("val", batch_size, device)
+        x, y = dataset.get_batch(split, batch_size, device)
         _, loss = model(x, y)
         losses.append(loss.item())
     model.train()  # 切回训练模式
@@ -75,22 +77,32 @@ def train(args):
     torch.manual_seed(args.seed)
 
     # ---- 1. 数据 + 词表 ----
-    print(f"\n加载数据: {args.data_path}")
-    dataset = TextDataset.from_file(
-        args.data_path,
+    # 词表用预训练 + 微调数据的字符合并建立，确保覆盖所有字符
+    print(f"\n加载预训练数据: {args.data_path}")
+    pretrain_text = Path(args.data_path).read_text(encoding="utf-8")
+    finetune_text = Path(args.finetune_path).read_text(encoding="utf-8")
+    combined_text = pretrain_text + finetune_text
+    print(f"预训练字符数: {len(pretrain_text):,}")
+    print(f"微调字符数: {len(finetune_text):,}")
+
+    tokenizer = CharTokenizer(combined_text)
+    print(f"词表大小（合并建表）: {tokenizer.vocab_size}")
+
+    # 训练数据只用预训练文本，但复用上面的词表
+    dataset = TextDataset.from_text(
+        pretrain_text,
         context_length=args.context_length,
         train_ratio=args.train_ratio,
+        tokenizer=tokenizer,
     )
-    vocab_size = dataset.tokenizer.vocab_size
-    print(f"词表大小: {vocab_size}")
-    print(f"训练 token 数: {len(dataset.train_ids)}")
-    print(f"验证 token 数: {len(dataset.val_ids)}")
+    print(f"训练 token 数: {len(dataset.train_ids):,}")
+    print(f"验证 token 数: {len(dataset.val_ids):,}")
 
     # ---- 2. 模型 ----
     print(f"\n创建模型: n_embd={args.n_embd}, n_layer={args.n_layer}, "
           f"n_head={args.n_head}")
     model = GPT(
-        vocab_size=vocab_size,
+        vocab_size=tokenizer.vocab_size,
         context_length=args.context_length,
         n_embd=args.n_embd,
         n_layer=args.n_layer,
@@ -159,49 +171,60 @@ def train(args):
 
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
-                checkpoint = {
-                    "model_state_dict": model.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict(),
-                    "step": step,
-                    "best_val_loss": best_val_loss,
-                    "config": {
-                        "vocab_size": vocab_size,
+                save_checkpoint(
+                    model=model,
+                    optimizer=optimizer,
+                    step=step,
+                    best_val_loss=best_val_loss,
+                    config={
+                        "vocab_size": tokenizer.vocab_size,
                         "context_length": args.context_length,
                         "n_embd": args.n_embd,
                         "n_layer": args.n_layer,
                         "n_head": args.n_head,
                         "dropout": args.dropout,
                     },
-                }
-                best_path = ckpt_dir / "pretrain_best.pt"
-                torch.save(checkpoint, str(best_path))
-                print(f"  -> 保存最好的模型: {best_path} (val_loss={val_loss:.4f})")
+                    path=ckpt_dir / "pretrain_best.pt",
+                    stage="pretrain",
+                    tokenizer=tokenizer,
+                    data_path=args.data_path,
+                )
+                print(f"  -> 保存最好的模型: pretrain_best.pt (val_loss={val_loss:.4f})")
+
+    # ---- 5.5 测试集评估 ----
+    test_loss = evaluate(model, dataset, args.eval_iters, args.batch_size,
+                         device, split="test")
+    print(f"\n测试集 loss: {test_loss:.4f}")
 
     # ---- 6. 保存最后的模型 ----
-    last_path = ckpt_dir / "pretrain_last.pt"
-    torch.save({
-        "model_state_dict": model.state_dict(),
-        "optimizer_state_dict": optimizer.state_dict(),
-        "step": args.max_steps,
-        "best_val_loss": best_val_loss,
-        "config": {
-            "vocab_size": vocab_size,
+    save_checkpoint(
+        model=model,
+        optimizer=optimizer,
+        step=args.max_steps,
+        best_val_loss=best_val_loss,
+        config={
+            "vocab_size": tokenizer.vocab_size,
             "context_length": args.context_length,
             "n_embd": args.n_embd,
             "n_layer": args.n_layer,
             "n_head": args.n_head,
             "dropout": args.dropout,
         },
-    }, str(last_path))
-    print(f"\n保存最终模型: {last_path}")
+        path=ckpt_dir / "pretrain_last.pt",
+        stage="pretrain",
+        tokenizer=tokenizer,
+        data_path=args.data_path,
+    )
+    print(f"\n保存最终模型: pretrain_last.pt")
 
     # ---- 7. 保存训练日志 ----
     log_path = out_dir / "training_log.txt"
     with open(log_path, "w", encoding="utf-8") as f:
         f.write(f"训练步数: {args.max_steps}\n")
-        f.write(f"词表大小: {vocab_size}\n")
+        f.write(f"词表大小: {tokenizer.vocab_size}\n")
         f.write(f"模型参数量: {n_params:,}\n")
         f.write(f"最好 val_loss: {best_val_loss:.4f}\n")
+        f.write(f"测试集 loss: {test_loss:.4f}\n")
         f.write(f"\n训练 loss:\n")
         for step, loss in train_losses:
             f.write(f"step {step}: {loss:.4f}\n")
@@ -249,6 +272,8 @@ def main():
     parser = argparse.ArgumentParser(description="GPT 预训练脚本")
     parser.add_argument("--data_path", type=str,
                         default="data/raw/pretrain.txt")
+    parser.add_argument("--finetune_path", type=str,
+                        default="data/raw/finetune.txt")
     parser.add_argument("--checkpoint_dir", type=str, default="checkpoints")
     parser.add_argument("--output_dir", type=str, default="outputs/training")
 
