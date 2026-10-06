@@ -4,7 +4,6 @@ small-gpt/
 │
 ├── README.md                       # 项目总说明，三人共同维护
 ├── requirements.txt               # Python 依赖
-├── config.py                       # 全局模型/训练配置
 ├── .gitignore
 │
 ├── data/                           # 【B 主负责】数据
@@ -13,10 +12,15 @@ small-gpt/
 │   │   ├── pretrain.txt            # 预训练数据（莎士比亚戏剧）
 │   │   └── finetune.txt            # 微调数据（莎士比亚十四行诗）
 │   │
-│   └── processed/
-│       ├── train.txt
-│       ├── val.txt
-│       └── test.txt
+│   └── processed/                  # 划分后的训练/验证/测试集
+│       ├── pretrain/
+│       │   ├── train.txt
+│       │   ├── val.txt
+│       │   └── test.txt
+│       └── finetune/
+│           ├── train.txt
+│           ├── val.txt
+│           └── test.txt
 │
 ├── configs/                        # 【B】训练超参数配置
 │   ├── pretrain.json
@@ -56,12 +60,6 @@ small-gpt/
 │   │   ├── kv_cache_benchmark.py
 │   │   └── attention_benchmark.py
 │   │
-│   └── utils/                      # 【共同】
-│       ├── __init__.py
-│       ├── device.py
-│       ├── seed.py
-│       └── logger.py
-│
 ├── ui/                             # ⭐【C 新增负责】
 │   ├── app.py                      # UI 主程序
 │   ├── model_service.py            # UI 与模型之间的接口
@@ -101,7 +99,9 @@ small-gpt/
 │   ├── finetune/                   # 【B】
 │   │   ├── before_after.txt
 │   │   ├── finetune_log.txt
-│   │   └── loss_curve.png
+│   │   ├── loss_curve.png
+│   │   ├── specialized_evidence.txt
+│   │   └── failure_cases.txt
 │   │
 │   └── benchmark/                  # 【C】
 │       ├── benchmark_results.txt

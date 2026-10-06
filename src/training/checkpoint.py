@@ -1,4 +1,4 @@
-"""B 的 checkpoint 模块：封装模型的保存与加载。
+﻿"""B 的 checkpoint 模块：封装模型的保存与加载。
 
 为什么需要这个文件：
 - train.py 训练完会保存模型
@@ -92,7 +92,7 @@ def capture_rng_states():
 
 def save_checkpoint(model, optimizer, step, best_val_loss, config, path,
                     stage="pretrain", tokenizer=None, data_path=None,
-                    parent_checkpoint=None):
+                    parent_checkpoint=None, train_config=None):
     """保存 checkpoint。
 
     Args:
@@ -106,6 +106,7 @@ def save_checkpoint(model, optimizer, step, best_val_loss, config, path,
         tokenizer: tokenizer 对象（计算 tokenizer_hash 用）
         data_path: 数据文件路径（计算 data_version 用）
         parent_checkpoint: 父 checkpoint 路径（微调时是预训练 checkpoint）
+        train_config: dict，训练配置（batch_size, learning_rate, max_steps 等）
     """
     checkpoint = {
         # 原有字段
@@ -113,6 +114,9 @@ def save_checkpoint(model, optimizer, step, best_val_loss, config, path,
         "optimizer_state_dict": optimizer.state_dict() if optimizer is not None else None,
         "step": step,
         "best_val_loss": best_val_loss,
+        "model_config": config,
+        "train_config": train_config,
+        # 兼容旧代码: 保留 config 字段(等同于 model_config)
         "config": config,
         # 分工 7.3 节新增字段
         "stage": stage,
@@ -251,7 +255,7 @@ if __name__ == "__main__":
     # 假装有 tokenizer 和数据
     class FakeTokenizer:
         def __init__(self):
-            self.char_to_id = {"a": 0, "b": 1, "c": 2}
+            self.stoi = {"a": 0, "b": 1, "c": 2}
 
     tok = FakeTokenizer()
 
@@ -280,3 +284,4 @@ if __name__ == "__main__":
 
     # 清理
     Path(test_path).unlink(missing_ok=True)
+

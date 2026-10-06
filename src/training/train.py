@@ -188,6 +188,16 @@ def train(args):
                     stage="pretrain",
                     tokenizer=tokenizer,
                     data_path=args.data_path,
+                    train_config={
+                        "batch_size": args.batch_size,
+                        "learning_rate": args.learning_rate,
+                        "min_lr": args.min_lr,
+                        "max_steps": args.max_steps,
+                        "warmup_steps": args.warmup_steps,
+                        "grad_clip": args.grad_clip,
+                        "weight_decay": args.weight_decay,
+                        "seed": args.seed,
+                    },
                 )
                 print(f"  -> 保存最好的模型: pretrain_best.pt (val_loss={val_loss:.4f})")
 
@@ -214,6 +224,16 @@ def train(args):
         stage="pretrain",
         tokenizer=tokenizer,
         data_path=args.data_path,
+        train_config={
+                        "batch_size": args.batch_size,
+                        "learning_rate": args.learning_rate,
+                        "min_lr": args.min_lr,
+                        "max_steps": args.max_steps,
+                        "warmup_steps": args.warmup_steps,
+                        "grad_clip": args.grad_clip,
+                        "weight_decay": args.weight_decay,
+                        "seed": args.seed,
+                    },
     )
     print(f"\n保存最终模型: pretrain_last.pt")
 
