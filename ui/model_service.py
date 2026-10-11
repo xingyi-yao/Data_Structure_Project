@@ -11,7 +11,8 @@ UI：python -m ui.app
 2. TODO(B)：提供 MODEL_SPECS 中的 checkpoint 与训练词表；config 用普通字典保存。
    checkpoint 至少含 model_state_dict、config、training_step、validation_loss。
 3. tokenizer.json 是本代码补充的保存约定（原文未指定词表文件格式）：
-   B 使用本包 CharTokenizer.save 保存，或在 checkpoint 中增加 tokenizer 字典。
+   B 使用 CharTokenizer.save 或 BPETokenizer.save 保存，或在 checkpoint 中增加 tokenizer 字典。
+   自动识别 char/bpe；更换分词器必须使用对应词表训练的 checkpoint。
 不读取 prompt 临时建词表；必须恢复训练时的 token↔ID 映射。
 """
 import argparse
@@ -21,7 +22,7 @@ from threading import RLock
 import time
 import torch
 
-from src.tokenizer.char_tokenizer import CharTokenizer
+from src.tokenizer import load_tokenizer, tokenizer_from_dict
 from src.inference.generate import generate as generate_tokens, get_context_length
 from src.optimization.benchmark import seeded, synchronize
 from src.optimization.kv_cache_benchmark import compare_kv_cache, run_kv_cache_sweep
@@ -77,11 +78,12 @@ class ModelService:
             config = checkpoint["config"]
             if not isinstance(config, dict):
                 raise TypeError("TODO(B)：请把 checkpoint['config'] 保存为普通字典")
-            embedded = CharTokenizer.from_dict(checkpoint["tokenizer"]) if "tokenizer" in checkpoint else None
+            embedded = tokenizer_from_dict(checkpoint["tokenizer"]) if "tokenizer" in checkpoint else None
             if tokenizer_path is not None and Path(tokenizer_path).is_file():
-                tokenizer = CharTokenizer.load(tokenizer_path)
-                if embedded is not None and tokenizer.chars != embedded.chars:
-                    raise ValueError("外部词表与 checkpoint 内词表的 ID 顺序不一致")
+                tokenizer = load_tokenizer(tokenizer_path)
+                # BPE 即使基础字符相同，合并规则也可能不同，必须比较完整状态。
+                if embedded is not None and tokenizer.to_dict() != embedded.to_dict():
+                    raise ValueError("外部词表与 checkpoint 内词表的类型、ID 顺序或合并规则不一致")
             elif embedded is not None:
                 tokenizer = embedded
             else:

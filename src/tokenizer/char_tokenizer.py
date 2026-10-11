@@ -1,4 +1,4 @@
-"""字符级 Tokenizer；B 训练时保存词表，C 推理时按同一 ID 顺序加载。"""
+"""字符级 Tokenizer:B 训练时保存词表,C 推理时按同一 ID 顺序加载。"""
 
 import json
 from pathlib import Path
