@@ -2,3 +2,5 @@
 /check_overfit.py
 /outputs
 .venv/
+__pycache__/
+*.pyc
