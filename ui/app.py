@@ -1,9 +1,12 @@
 """三页 Gradio UI。根目录运行：python -m ui.app
 
-TODO(A/B)：先填写 model_service.py 的模型构造入口与 checkpoint/词表路径。
+先运行预训练/微调命令生成 checkpoint，再使用对应页面。
 页面可先启动；缺少文件时点击按钮会显示错误提示，不伪造模型输出。
 Gradio API 参考：https://www.gradio.app/docs/gradio/blocks
 """
+from .pages.generation import build_generation_page
+from .pages.finetune_demo import build_finetune_page
+from .pages.benchmark import build_benchmark_page
 from functools import wraps
 import gradio as gr
 from .model_service import (ModelService, MODEL_SPECS, PROJECT_ROOT,
@@ -76,50 +79,11 @@ def create_app():
                   r["with_cache"]["tokens_per_second"], r["speedup"]] for r in comparisons]
         return table, figure, comparisons
 
-    def generation_controls():
-        count = gr.Slider(1, 500, value=100, step=1, label="Max New Tokens")
-        temperature = gr.Slider(0.05, 2.0, value=1.0, step=0.05, label="Temperature")
-        top_k = gr.Number(value=0, minimum=0, precision=0, label="Top-k（0 表示关闭）")
-        strategy = gr.Radio(["sample", "greedy"], value="sample", label="Sampling")
-        cache = gr.Checkbox(value=False, label="Use KV Cache")
-        seed = gr.Number(value=42, precision=0, label="Random Seed")
-        return [count, temperature, top_k, strategy, cache, seed]
-
     with gr.Blocks(title="Small Language Model") as demo:
         gr.Markdown("# Small Language Model\n文本生成 · 微调对比 · KV Cache 性能测试")
-        with gr.Tab("Text Generation"):
-            name = gr.Dropdown(["pretrain", "finetune"], value="pretrain", label="Model")
-            prompt = gr.Textbox(label="Prompt", lines=3)
-            controls = generation_controls()
-            button = gr.Button("Generate")
-            output = gr.Textbox(label="Generated Text", lines=10)
-            stats = gr.JSON(label="生成时间与速度")
-            button.click(do_generate, [name, prompt, *controls], [output, stats],
-                         concurrency_id="model_operations", concurrency_limit=1)
-        with gr.Tab("Fine-Tuning Comparison"):
-            prompt = gr.Textbox(label="同一个 Prompt", lines=3)
-            controls = generation_controls()
-            button = gr.Button("Compare")
-            with gr.Row():
-                before = gr.Textbox(label="Pre-trained Output", lines=10)
-                after = gr.Textbox(label="Fine-tuned Output", lines=10)
-            stats = gr.JSON(label="运行信息")
-            button.click(do_compare, [prompt, *controls], [before, after, stats],
-                         concurrency_id="model_operations", concurrency_limit=1)
-        with gr.Tab("Performance Benchmark"):
-            gr.Markdown("固定使用 Greedy，先检查缓存前后生成一致，再进行预热与重复计时。")
-            name = gr.Dropdown(["pretrain", "finetune"], value="pretrain", label="Model")
-            prompt = gr.Textbox(label="Prompt")
-            lengths = gr.Textbox(value="50,100,200,500", label="生成长度")
-            repeats = gr.Slider(1, 10, value=3, step=1, label="重复次数")
-            button = gr.Button("Run Benchmark")
-            table = gr.Dataframe(headers=["Tokens", "No Cache 秒", "Cache 秒",
-                                          "No Cache tok/s", "Cache tok/s", "Speedup"],
-                                 datatype=["number"] * 6, interactive=False)
-            figure = gr.Image(type="filepath", label="实测曲线")
-            raw = gr.JSON(label="原始记录与内存统计")
-            button.click(do_benchmark, [name, prompt, lengths, repeats], [table, figure, raw],
-                         concurrency_id="model_operations", concurrency_limit=1)
+        build_generation_page(do_generate)
+        build_finetune_page(do_compare)
+        build_benchmark_page(do_benchmark)
     return demo.queue(default_concurrency_limit=1)
 
 

@@ -2,7 +2,7 @@
 
 从项目根目录运行：
 python -m src.optimization.benchmark --prompt "hello" --lengths 50 100 200 500
-TODO(A/B)：先完成 ui/model_service.py 中的模型构造入口和 checkpoint/词表路径。
+先运行训练入口生成 checkpoint，然后运行性能实验。
 CPU RSS 是进程内存快照，不声称是每个算子的内存峰值。
 """
 import argparse

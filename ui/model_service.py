@@ -6,13 +6,7 @@
 UI：python -m ui.app
 最终实验：python -m ui.model_service --task final --prompt "hello" --device cpu
 
-待接入：
-1. TODO(A)：修改 build_model_from_config；模型普通/缓存返回值见 kv_cache.py。
-2. TODO(B)：提供 MODEL_SPECS 中的 checkpoint 与训练词表；config 用普通字典保存。
-   checkpoint 至少含 model_state_dict、config、training_step、validation_loss。
-3. tokenizer.json 是本代码补充的保存约定（原文未指定词表文件格式）：
-   B 使用 CharTokenizer.save 或 BPETokenizer.save 保存，或在 checkpoint 中增加 tokenizer 字典。
-   自动识别 char/bpe；更换分词器必须使用对应词表训练的 checkpoint。
+训练入口保存兼容的 checkpoint，内嵌完整词表。
 不读取 prompt 临时建词表；必须恢复训练时的 token↔ID 映射。
 """
 import argparse
@@ -27,24 +21,14 @@ from src.inference.generate import generate as generate_tokens, get_context_leng
 from src.optimization.benchmark import seeded, synchronize
 from src.optimization.kv_cache_benchmark import compare_kv_cache, run_kv_cache_sweep
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-# TODO(B)：以下 checkpoint 名称遵循原文；词表路径按 B 实际交付修改。
-# 微调沿用原词表时两项可指向同一个 tokenizer.json；若不同，分别指定各自词表。
-MODEL_SPECS = {
-    "pretrain": {"checkpoint": PROJECT_ROOT / "checkpoints/pretrain_best.pt",
-                 "tokenizer": PROJECT_ROOT / "checkpoints/tokenizer.json"},
-    "finetune": {"checkpoint": PROJECT_ROOT / "checkpoints/finetune_best.pt",
-                 "tokenizer": PROJECT_ROOT / "checkpoints/tokenizer.json"},
-}
+from config import PROJECT_ROOT, normalize_model_config
+from .config import MODEL_SPECS
 
 
 def build_model_from_config(config: dict):
-    """唯一模型构造适配点；由 A 的真实类名和构造函数确定。"""
-    # TODO(A)：拿到 A 的代码后，按实际名称取消/修改下面两行并替换 raise：
-    # from src.model.gpt import GPT, GPTConfig
-    # return GPT(GPTConfig(**config))
-    # 如果 A 接收字典，则是 return GPT(config)；不要同时使用两种写法。
-    raise NotImplementedError("TODO(A)：请在 ui/model_service.py 的 build_model_from_config 中接入 GPT 类")
+    """构造真实 GPT，并兼容旧配置字段名。"""
+    from src.model.gpt import GPT
+    return GPT(**normalize_model_config(config))
 
 
 class ModelService:
@@ -68,7 +52,7 @@ class ModelService:
         with self._lock:
             path = Path(checkpoint_path).resolve()
             if not path.is_file():
-                raise FileNotFoundError(f"TODO(B)：缺少 checkpoint：{path}")
+                raise FileNotFoundError(f"缺少 checkpoint：{path}")
             # config/metadata 请保存为 dict/int/float 等基本类型。
             # 官方序列化说明：https://docs.pytorch.org/docs/stable/notes/serialization
             checkpoint = torch.load(path, map_location="cpu", weights_only=True)
@@ -77,7 +61,7 @@ class ModelService:
                 raise ValueError(f"checkpoint 需要字段：{sorted(required)}")
             config = checkpoint["config"]
             if not isinstance(config, dict):
-                raise TypeError("TODO(B)：请把 checkpoint['config'] 保存为普通字典")
+                raise TypeError("请把 checkpoint['config'] 保存为普通字典")
             embedded = tokenizer_from_dict(checkpoint["tokenizer"]) if "tokenizer" in checkpoint else None
             if tokenizer_path is not None and Path(tokenizer_path).is_file():
                 tokenizer = load_tokenizer(tokenizer_path)
@@ -87,7 +71,7 @@ class ModelService:
             elif embedded is not None:
                 tokenizer = embedded
             else:
-                raise FileNotFoundError("TODO(B)：提供训练时的 tokenizer.json 或 checkpoint['tokenizer']")
+                raise FileNotFoundError("提供训练时的 tokenizer.json 或 checkpoint['tokenizer']")
             if config.get("vocab_size") != tokenizer.vocab_size:
                 raise ValueError("config.vocab_size 与训练词表不匹配")
             limit = config.get("context_length", config.get("block_size"))
@@ -172,7 +156,11 @@ def compare_finetuning(pretrain, finetune, prompt, **settings):
     """相同 prompt、参数与种子；每个模型使用其训练时的词表。"""
     before = pretrain.generate(prompt, **settings)
     after = finetune.generate(prompt, **settings)
-    return {"pretrain": before, "finetune": after}
+    result = {"pretrain": before, "finetune": after}
+    path = PROJECT_ROOT / "outputs/finetune/before_after.txt"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    return result
 
 
 def main():
@@ -189,8 +177,11 @@ def main():
         services[name] = ModelService(device=args.device)
         spec = MODEL_SPECS[name]
         services[name].load_model(spec["checkpoint"], spec["tokenizer"])
-    records = [service.generate(args.prompt, args.max_new_tokens, strategy="greedy")
-               for service in services.values()]
+    if args.task in ("compare", "final"):
+        records = list(compare_finetuning(services["pretrain"], services["finetune"], args.prompt,
+                       max_new_tokens=args.max_new_tokens, strategy="greedy").values())
+    else:
+        records = [services["pretrain"].generate(args.prompt, args.max_new_tokens, strategy="greedy")]
     save_generation_samples(records)
     print(json.dumps(records, ensure_ascii=False, indent=2))
     if args.task == "final":
