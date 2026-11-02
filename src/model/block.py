@@ -28,15 +28,17 @@ class TransformerBlock(nn.Module): #定义一个神经网络模块
             dropout=dropout,
         )
 
-    def forward(self, x):
+    def forward(self, x, past_kv=None, use_cache=False):
         # 第一部分：归一化 → Attention → 残差相加
-        attention_output = self.attention(self.ln1(x)) #把x规范化之后送入Attention
+        attention_output = self.attention(self.ln1(x), past_kv=past_kv, use_cache=use_cache)
+        if use_cache:
+            attention_output, present = attention_output
         x = x + self.attn_output_dropout(attention_output)  #在原来基础上补充一些信息
 
         # 第二部分：归一化 → FFN → 残差相加
         x = x + self.feedforward(self.ln2(x))
 
-        return x
+        return (x, present) if use_cache else x
 
 
 # if __name__ == "__main__":

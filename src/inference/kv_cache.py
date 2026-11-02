@@ -1,6 +1,6 @@
 """KV Cache 数据约定与检查；Attention 的内部计算由 A 实现。
 
-TODO(A)：模型需要提供以下两个 forward 分支：
+GPT 提供以下两个 forward 分支：
     logits, loss = model(idx, targets=None)
     logits, present_kv = model(idx, past_kv=None, use_cache=True)
 

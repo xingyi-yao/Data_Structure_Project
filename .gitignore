@@ -1,6 +1,13 @@
 /.vscode
 /check_overfit.py
-/outputs
+/outputs/**
+!/outputs/**/
+!/outputs/**/.gitkeep
 .venv/
 __pycache__/
 *.pyc
+
+.pytest_cache/
+/checkpoints/*
+!/checkpoints/.gitkeep
+/data/processed/finetune/

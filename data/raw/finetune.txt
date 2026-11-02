@@ -1,0 +1,120 @@
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+question: what is a tree?
+answer: a tree contains nodes and edges.
+question: what is a graph?
+answer: a graph connects vertices with edges.

@@ -1,0 +1,324 @@
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.
+hello small gpt.
+a data structure stores and organizes data.
+an array keeps elements in a sequence.
+a linked list connects nodes with links.
+a stack follows last in first out.
+a queue follows first in first out.
+a tree contains nodes and edges.
+a graph connects vertices with edges.
+a hash table maps keys to values.
+binary search works on a sorted array.
+training predicts the next token from previous tokens.
+attention combines information from previous positions.
+a model learns patterns from training data.
+validation measures loss on held out text.
+question: what is a stack?
+answer: a stack follows last in first out.
+question: what is a queue?
+answer: a queue follows first in first out.

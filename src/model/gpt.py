@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F #这个函数用来计算训练时候的交叉熵损失
 
 from .block import TransformerBlock
+from src.inference.kv_cache import validate_cache
 
 
 class GPT(nn.Module): #定义整个GPT模型
@@ -11,6 +12,12 @@ class GPT(nn.Module): #定义整个GPT模型
     def __init__(self, vocab_size, context_length=128,
                  n_embd=64, n_layer=2, dropout=0.1, n_head=1): #vocab_size是统计词表里有多少token n_layer是有几个Transformer Block
         super().__init__()
+        for name, value in dict(vocab_size=vocab_size, context_length=context_length,
+                                n_embd=n_embd, n_layer=n_layer, n_head=n_head).items():
+            if type(value) is not int or value < 1:
+                raise ValueError(f"{name} 必须为正整数")
+        if not 0 <= dropout < 1:
+            raise ValueError("dropout 必须在 [0, 1) 内")
         self.vocab_size = vocab_size
         self.context_length = context_length
         self.config = dict(
@@ -36,7 +43,7 @@ class GPT(nn.Module): #定义整个GPT模型
         # 特征向量 → 词表中每个 token 的预测分数
         self.lm_head = nn.Linear(n_embd, vocab_size, bias=False)
 
-    def forward(self, idx, targets=None):
+    def forward(self, idx, targets=None, *, past_kv=None, use_cache=False):
         if idx.ndim != 2:
             raise ValueError("idx 的形状必须是 [B, T]")
 
@@ -44,13 +51,27 @@ class GPT(nn.Module): #定义整个GPT模型
         if not 1 <= T <= self.context_length:
             raise ValueError("序列长度必须在 1 和 context_length 之间")
 
-        positions = torch.arange(T, device=idx.device) 
+        if past_kv is not None and not use_cache:
+            raise ValueError("past_kv 需要 use_cache=True")
+        if use_cache and targets is not None:
+            raise ValueError("缓存推理模式不接收训练 targets")
+        past_length = 0 if past_kv is None else validate_cache(
+            past_kv, batch_size=idx.size(0), expected_layers=len(self.blocks), device=idx.device)
+        if past_length + T > self.context_length:
+            raise ValueError("缓存与输入总长度超过 context_length")
+        positions = torch.arange(past_length, past_length + T, device=idx.device)
 
         x = self.token_embedding(idx) + self.position_embedding(positions) #就是把token的向量表示和它的位置向量表示加起来
         x = self.embedding_dropout(x)
 
-        for block in self.blocks:
-            x = block(x)
+        present = []
+        for i, block in enumerate(self.blocks):
+            result = block(x, past_kv=None if past_kv is None else past_kv[i], use_cache=use_cache)
+            if use_cache:
+                x, layer_cache = result
+                present.append(layer_cache)
+            else:
+                x = result
 
         logits = self.lm_head(self.final_norm(x)) #对下一个token预测分数
 
@@ -65,7 +86,7 @@ class GPT(nn.Module): #定义整个GPT模型
                 targets.reshape(-1),
             )
 
-        return logits, loss
+        return (logits, present) if use_cache else (logits, loss)
 
 
 if __name__ == "__main__":

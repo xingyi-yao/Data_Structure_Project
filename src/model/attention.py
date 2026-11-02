@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from src.inference.kv_cache import append_layer_kv
 
 
 class CausalSelfAttention(nn.Module):
@@ -27,7 +29,9 @@ class CausalSelfAttention(nn.Module):
         )
         self.register_buffer("causal_mask", mask)
 
-    def forward(self, x):
+    def forward(self, x, past_kv=None, use_cache=False):
+        if past_kv is not None and not use_cache:
+            raise ValueError("past_kv 需要 use_cache=True")
         B, T, D = x.shape
         if not 1 <= T <= self.context_length:
             raise ValueError("序列长度必须在 1 和 context_length 之间")
@@ -40,10 +44,15 @@ class CausalSelfAttention(nn.Module):
         k = k.transpose(1, 2)
         v = v.transpose(1, 2)
 
+        k, v = append_layer_kv(past_kv, k, v)
+        past_length = k.size(-2) - T
+        if k.size(-2) > self.context_length:
+            raise ValueError("缓存与输入总长度超过 context_length")
+
         # 各个头分别计算注意力，分数形状为 [B,H,T,T]。
         scores = (q @ k.transpose(-2, -1)) * self.scale #也是交换两个维度，但是使用的负标签
         scores = scores.masked_fill(
-            ~self.causal_mask[:T, :T], float("-inf")  #先生成全部为True的矩阵，这里刚开始矩阵创建的时候可能是按照context_length × context_length的，但是T可能比创建的小，就只取左上角的
+            ~self.causal_mask[past_length:past_length + T, :k.size(-2)], float("-inf")
         )           #只保留三角的True部分，其他部分为False，False部分的分数被置为负无穷大，这样在softmax后就会变成0
         weights = torch.softmax(scores, dim=-1)# 把注意力分数转化为注意力权重
         weights = self.attn_dropout(weights)
@@ -51,7 +60,23 @@ class CausalSelfAttention(nn.Module):
 
         # [B,H,T,head_dim] → [B,T,H,head_dim] → [B,T,D]
         output = output.transpose(1, 2).contiguous().view(B, T, D) #变回原来的维度数
-        return self.proj(output)
+        output = self.proj(output)
+        return (output, (k, v)) if use_cache else output
+
+
+class SDPAAttention(CausalSelfAttention):
+    """性能实验变体；保留独立 Q/K/V 参数名以直接复用基线权重。"""
+
+    def forward(self, x):
+        B, T, D = x.shape
+        if not 1 <= T <= self.context_length:
+            raise ValueError("序列长度必须在 1 和 context_length 之间")
+        q, k, v = [layer(x).reshape(B, T, self.n_head, self.head_dim).transpose(1, 2)
+                   for layer in (self.query, self.key, self.value)]
+        output = F.scaled_dot_product_attention(
+            q, k, v, is_causal=True,
+            dropout_p=self.attn_dropout.p if self.training else 0.0)
+        return self.proj(output.transpose(1, 2).contiguous().view(B, T, D))
 
 
 # if __name__ == "__main__":

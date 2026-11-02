@@ -2,7 +2,7 @@
 
 独立运行：python -m src.optimization.attention_benchmark --lengths 64 128 256
 这个独立实验只比较同一 Q/K/V 的注意力计算，不代表整个 GPT 的加速比。
-TODO(A)：预生成 mask、合并 QKV 的 Attention 模块接到 build_attention_variants。
+build_attention_variants 提供同权重的手写与 SDPA 模块。
 官方 SDPA API：https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention
 """
 import argparse
@@ -53,21 +53,13 @@ def benchmark_attention_kernels(lengths=(64, 128, 256), *, batch_size=2,
     return rows
 
 
-def build_attention_variants():
-    """TODO(A)：此处返回你们实际模块，C 无法替 A 猜构造函数和参数名。
-
-    示例（根据 A 的类名修改并取消注释）：
-        from src.model.attention import ManualAttention, OptimizedAttention
-        baseline = ManualAttention(config)
-        optimized = OptimizedAttention(config)
-        # 由 A 显式拷贝同一套权重；合并 QKV 时 state_dict 名称通常不同。
-        # optimized.qkv.weight.copy_(torch.cat([baseline.query.weight, ...], dim=0))
-        return {"manual": baseline, "precomputed_mask": optimized}
-
-    每个模块调用 module(x) -> output Tensor，shape=[B,T,C]。
-    若 A 的模块返回 (output, cache)，在此处用包装模块取 result[0]。
-    """
-    raise NotImplementedError("TODO(A)：接入具有相同权重的 Attention 变体")
+def build_attention_variants(n_embd=128, context_length=256, n_head=4, device="cpu"):
+    """比较同权重的手写 Attention 和 SDPA。"""
+    from src.model.attention import CausalSelfAttention, SDPAAttention
+    baseline = CausalSelfAttention(n_embd, context_length, dropout=0.0, n_head=n_head)
+    optimized = SDPAAttention(n_embd, context_length, dropout=0.0, n_head=n_head)
+    optimized.load_state_dict(baseline.state_dict(), strict=True)
+    return {"manual": baseline.to(device), "sdpa": optimized.to(device)}
 
 
 def benchmark_attention_variants(variants, x, *, warmup=2, repeats=5,
